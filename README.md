@@ -29,7 +29,7 @@ I care most about two groups of people: the ones on the other side of the screen
 |---|---|---|
 | [Manifest Editor](https://wilsont0554.github.io/ManifestEditor/) | Capstone for stakeholders in London. I built the IndexedDB storage layer, page routing, shared manifest state and the gallery page, and refactored 800+ lines into shared hooks. | React, TypeScript, IndexedDB, Tailwind |
 | [Kintsugi3DBuilder](https://michaelt919.github.io/Kintsugi3DBuilder/) | University research software for 3D texture reconstruction. I replaced crashes with clear warnings, fixed thread-freeze bugs and added image disabling for Metashape imports. | Java, JavaFX, Maven |
-| [Church website](https://www.gishendebrekerbe.com) | Built most of the original site in a 2-person team, plus a Sanity CMS so staff publish news and videos themselves. | Next.js, TypeScript, Sanity |
+| [Gishen Debre Kerbe Church website](https://www.gishendebrekerbe.com) | Built most of the original site in a 2-person team, plus a Sanity CMS so staff publish news and videos themselves. | Next.js, TypeScript, Sanity |
 | [UniMentor](https://github.com/CSTP2305-BlueMango/UniMentor) | iOS peer-tutoring app. I built sign-up, login, email verification and profile screens. | Swift, SwiftUI, Firebase |
 
 <div align="center">
