@@ -97,7 +97,7 @@ def wrap(face, s, size, maxw):
 
 
 # ------------------------------------------------------------------ palette
-# Catppuccin (https://catppuccin.com/palette): Macchiato for GitHub's dark
+# Catppuccin (https://catppuccin.com/palette): Mocha for GitHub's dark
 # mode, Latte, its light flavour, for light mode.
 def mix(a, b, k):
     """Blend hex colour a toward b by k (0..1)."""
@@ -112,17 +112,47 @@ def heat(empty, base, green, steps=(0.35, 0.6, 0.8, 1.0)):
 
 LATTE = dict(base="#EFF1F5", surface0="#CCD0DA", empty="#E6E9EF", text="#4C4F69", subtext0="#6C6F85", overlay2="#7C7F93",
              green="#40A02B", blue="#1E66F5", mauve="#8839EF", teal="#179299", yellow="#DF8E1D", red="#D20F39")
-MACCHIATO = dict(base="#24273A", surface0="#363A4F", empty="#363A4F", text="#CAD3F5", subtext0="#A5ADCB", overlay2="#939AB7",
-                 green="#A6DA95", blue="#8AADF4", mauve="#C6A0F6", teal="#8BD5CA", yellow="#EED49F", red="#ED8796")
+MOCHA = dict(base="#1E1E2E", surface0="#313244", empty="#313244", text="#CDD6F4", subtext0="#A6ADC8", overlay2="#9399B2",
+             green="#A6E3A1", blue="#89B4FA", mauve="#CBA6F7", teal="#94E2D5", yellow="#F9E2AF", red="#F38BA8")
 
 
-def flavour(c):
-    return dict(ink=c["text"], muted=c["subtext0"], faint=c["overlay2"], prompt=c["green"], path=c["blue"],
-                accent=c["mauve"], easy=c["teal"], medium=c["yellow"], hard=c["red"],
-                heat=heat(c["empty"], c["base"], c["green"]))
+def luminance(h):
+    c = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+    c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
 
 
-T = {"light": flavour(LATTE), "dark": flavour(MACCHIATO)}
+def contrast(a, b):
+    hi, lo = sorted((luminance(a), luminance(b)), reverse=True)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+def legible(fg, page, ratio=4.5):
+    """Nudge fg toward black or white, keeping its hue, until it reads at
+    `ratio` on the page. The art is transparent, so `page` is GitHub's own
+    background, not Catppuccin's base. Latte's green, teal, yellow and
+    overlay2 fall short on white; Mocha passes untouched."""
+    target = "#000000" if luminance(page) > 0.5 else "#FFFFFF"
+    k = 0.0
+    while contrast(mix(fg, target, k), page) < ratio and k < 1:
+        k += 0.01
+    return mix(fg, target, k)
+
+
+def flavour(c, page):
+    roles = dict(ink=c["text"], muted=c["subtext0"], faint=c["overlay2"], prompt=c["green"], path=c["blue"],
+                 accent=c["mauve"], easy=c["teal"], medium=c["yellow"], hard=c["red"])
+    out = {k: legible(v, page) for k, v in roles.items()}
+    # Heat cells are graphics, not text: keep Catppuccin's own green ramp.
+    out["heat"] = heat(c["empty"], c["base"], c["green"])
+    return out
+
+
+T = {"light": flavour(LATTE, "#FFFFFF"), "dark": flavour(MOCHA, "#0D1117")}
+
+# Left edge of every image's content. 0 lines the art up with the README's
+# own headings and text; 2 keeps rounded cells clear of the image edge.
+EDGE = 2
 
 STYLE = """<style>
   .o{animation:show .01s backwards}
@@ -212,26 +242,27 @@ def name_heatmap(t, x, y, pitch, cell, start_ms):
             lvl = (3 + int(v * 2)) if bits[r][c] == "#" else (1 if v < 0.04 else 0)
             rects.append(f'<rect x="{x + c*pitch}" y="{y + r*pitch}" width="{cell}" height="{cell}" rx="3" '
                          f'fill="{t["heat"][lvl]}"/>')
-        cols.append(f'<g class="h" style="animation-delay:{start_ms + c*16}ms">{"".join(rects)}</g>')
+        cols.append(f'<g class="h" style="animation-delay:{start_ms + c*12}ms">{"".join(rects)}</g>')
     return "".join(cols)
 
 
 def hero(theme):
     t = T[theme]
-    W, H = 1280, 676
+    W, H = 1280, 690
     s = window(W, H, t, "simon@cao: ~",
                "Terminal. whoami prints the name Simon Cao drawn as a contribution heatmap, "
                "then: Software Engineer, full-stack web. "
                "Now: Software Development Intern, ShyftFi LLC. Focus: full-stack web development. Stack: React, TypeScript, Next.js, Python. "
                "Education: B.S. Computer Science, UW–Stout, 2026. Status: open to full-time roles.")
-    x, sz = 48, 24
-    p, _ = prompt(t, x, 104, sz, "whoami", delay=200)
+    # Sequence: type `whoami` (150ms), sweep the name in (550–1.5s), print the
+    # tagline, type `cat profile.txt`, print it, park the cursor (~2.1s).
+    x, sz = EDGE, 22
+    p, _ = prompt(t, x, 104, sz, "whoami", delay=150)
     s.append(p)
-    pitch, cell = 22, 18
-    gx = (W - (53 * pitch - (pitch - cell))) / 2
-    s.append(name_heatmap(t, gx, 140, pitch, cell, 700))
-    s.append(later(1600, text(mono, "Software Engineer · full-stack web", sz, x, 342, t["muted"])))
-    p, _ = prompt(t, x, 414, sz, "cat profile.txt", delay=1800)
+    pitch, cell = 24, 20   # 53 columns span the full width, edge to edge
+    s.append(name_heatmap(t, EDGE, 136, pitch, cell, 550))
+    s.append(later(1250, text(mono, "Software Engineer · full-stack web", sz, x, 356, t["muted"])))
+    p, _ = prompt(t, x, 428, sz, "cat profile.txt", delay=1400)
     s.append(p)
     rows = [("now", "Software Development Intern, ShyftFi LLC", None),
             ("focus", "Full-stack web development", None),
@@ -240,17 +271,17 @@ def hero(theme):
             ("status", "Open to full-time roles", t["prompt"])]
     out = []
     for i, (k, v, dot) in enumerate(rows):
-        y = 458 + i * 36
+        y = 472 + i * 36
         out.append(text(mono, k, sz, x, y, t["faint"]))
         vx = x + mono.width("education  ", sz)
         if dot:
             out.append(f'<circle cx="{vx + 7}" cy="{y - 8}" r="6" fill="{dot}"/>')
             vx += 26
         out.append(text(mono, v, sz, vx, y, t["ink"]))
-    s.append(later(2500, "".join(out)))
-    py = 458 + len(rows) * 36 + 6
+    s.append(later(1950, "".join(out)))
+    py = 472 + len(rows) * 36 + 6
     p, cx = prompt(t, x, py, sz, "")
-    s.append(later(2700, p + f'<rect class="c" x="{cx + 2}" y="{py - 21}" width="13" height="27" fill="{t["ink"]}"/>'))
+    s.append(later(2050, p + f'<rect class="c" x="{cx + 2}" y="{py - 21}" width="13" height="27" fill="{t["ink"]}"/>'))
     s.append("</svg>")
     return "\n".join(s)
 
@@ -272,7 +303,7 @@ PROJECTS = [
          body="iOS app that connects university students with peer tutors.",
          stack="swift · swiftui · firebase"),
 ]
-ROW_X, ROW_SZ = 48, 22
+ROW_X, ROW_SZ = EDGE, 22
 
 
 def bare(w, h, label):
@@ -376,7 +407,7 @@ def leetcode(data, theme, today):
              f'({data["solved"]["Easy"]} easy, {data["solved"]["Medium"]} medium, {data["solved"]["Hard"]} hard). '
              f"{yr} submissions in the past year.")
     s = window(W, H, t, "simon@cao: ~/leetcode", label)
-    x, sz = 48, 22
+    x, sz = EDGE, 22
     p, _ = prompt(t, x, 100, sz, "leetcode stats --year")
     s.append(p)
 
@@ -390,7 +421,8 @@ def leetcode(data, theme, today):
         s.append(text(mono, f'{data["solved"][d]:>4} / {data["total"][d]}', 20, x + mono.width("medium ", 20), y, t["muted"]))
 
     # right column: 53-week heatmap ending today, weeks start on Sunday
-    gx, gy, cell, gap = 432, 168, 12, 3
+    cell, gap = 12, 3
+    gx, gy = 1280 - EDGE - (53 * (cell + gap) - gap), 168  # flush right
     pitch = cell + gap
     cells, months, last_col = [], [], -9
     day, col = start, 0
