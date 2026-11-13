@@ -1,9 +1,9 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=8B5CF6,3B82F6,00FF9C&height=240&section=header&text=[YOUR%20NAME]&fontSize=56&fontColor=ffffff&fontAlignY=38&desc=[Your%20short%20tagline%20here]&descAlign=50&descAlignY=58&animation=fadeIn" width="100%" alt="Header banner" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=8B5CF6,3B82F6,00FF9C&height=240&section=header&text=Simon%20Cao&fontSize=56&fontColor=ffffff&fontAlignY=38&desc=Full-Stack%20Software%20Engineer&descAlign=50&descAlignY=58&animation=fadeIn" width="100%" alt="Header banner" />
 
 <a href="https://git.io/typing-svg">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=22&pause=1000&color=00FF9C&center=true&vCenter=true&width=640&lines=[Line+1:+what+you+do];[Line+2:+what+you+are+building];[Line+3:+what+you+are+learning+now]" alt="Typing animation" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=22&pause=1000&color=00FF9C&center=true&vCenter=true&width=640&lines=Full-stack+engineer:+React,+TypeScript,+Python;Building+Python+%2B+AWS+integrations+at+ShyftFi;Exploring+agentic+AI+tools+like+Claude+Code" alt="Typing animation" />
 </a>
 
 </div>
@@ -12,42 +12,43 @@
 
 ## About me
 
-- **Role:** [e.g., Frontend developer / Data science student]
-- **Building:** [e.g., A task manager with real-time sync]
-- **Currently learning:** [e.g., Rust and systems programming]
-- **Open to:** [e.g., open source collaboration, internships, freelance work]
-- **Fun fact:** [Optional, one line]
+- **Role:** Full-stack software engineer, B.S. Computer Science, University of Wisconsin–Stout (2026)
+- **Building:** Python integrations between Odoo and AWS as a Software Development Intern at ShyftFi
+- **Currently learning:** Python backends and agentic AI
+- **Open to:** Full-time software engineering roles (full-stack or front-end)
+- **Fun fact:** I speak English and Vietnamese, and I led my university's Habitat for Humanity chapter
 
 ## Tech stack
 
-<!-- Replace the icon list with your own. Full list: https://github.com/tandpfun/skill-icons#icons -->
 <p>
-  <img src="https://skillicons.dev/icons?i=python,javascript,typescript,react,nodejs,docker,git,github,vscode&theme=dark&perline=9" alt="Tech stack icons" />
+  <img src="https://skillicons.dev/icons?i=ts,js,py,java,react,nextjs,tailwind,swift,mysql,mongodb,firebase,aws,git,github,figma&theme=dark&perline=8" alt="Tech stack icons" />
 </p>
 
 ## GitHub stats
 
 <div align="center">
 
-<img height="180" alt="GitHub stats" src="https://github-readme-stats.vercel.app/api?username=YOUR_USERNAME&show_icons=true&theme=tokyonight&hide_border=true&bg_color=0d1117&title_color=00FF9C&icon_color=8B5CF6&text_color=c9d1d9" />
-<img height="180" alt="Top languages" src="https://github-readme-stats.vercel.app/api/top-langs/?username=YOUR_USERNAME&layout=compact&langs_count=8&theme=tokyonight&hide_border=true&bg_color=0d1117&title_color=00FF9C&text_color=c9d1d9" />
+<img height="180" alt="GitHub stats" src="https://github-readme-stats.vercel.app/api?username=simoncao2000&show_icons=true&theme=tokyonight&hide_border=true&bg_color=0d1117&title_color=00FF9C&icon_color=8B5CF6&text_color=c9d1d9" />
+<img height="180" alt="Top languages" src="https://github-readme-stats.vercel.app/api/top-langs/?username=simoncao2000&layout=compact&langs_count=8&theme=tokyonight&hide_border=true&bg_color=0d1117&title_color=00FF9C&text_color=c9d1d9" />
 
 <br />
 
-<img height="180" alt="GitHub streak" src="https://streak-stats.demolab.com/?user=YOUR_USERNAME&theme=tokyonight&hide_border=true&background=0d1117&ring=00FF9C&fire=8B5CF6&currStreakLabel=00FF9C" />
+<img height="180" alt="GitHub streak" src="https://streak-stats.demolab.com/?user=simoncao2000&theme=tokyonight&hide_border=true&background=0d1117&ring=00FF9C&fire=8B5CF6&currStreakLabel=00FF9C" />
 
 <br />
 
-<img width="100%" alt="Contribution graph" src="https://github-readme-activity-graph.vercel.app/graph?username=YOUR_USERNAME&theme=react-dark&hide_border=true&bg_color=0d1117&line=00FF9C&point=8B5CF6&area=true&radius=4" />
+<img width="100%" alt="Contribution graph" src="https://github-readme-activity-graph.vercel.app/graph?username=simoncao2000&theme=react-dark&hide_border=true&bg_color=0d1117&line=00FF9C&point=8B5CF6&area=true&radius=4" />
 
 </div>
 
 ## Featured projects
 
-| Project | What it does | Stack |
+| Project | What I did | Stack |
 |---|---|---|
-| [Project 1 name](https://github.com/YOUR_USERNAME/PROJECT_1) | [One-sentence description] | [e.g., Python, FastAPI] |
-| [Project 2 name](https://github.com/YOUR_USERNAME/PROJECT_2) | [One-sentence description] | [e.g., React, Tailwind] |
+| [Manifest Editor](https://wilsont0554.github.io/ManifestEditor/) | Capstone for stakeholders in London. I built the IndexedDB storage layer, page routing, shared manifest state and the gallery page, and refactored 800+ lines into shared hooks. | React, TypeScript, IndexedDB, Tailwind |
+| [Kintsugi3DBuilder](https://michaelt919.github.io/Kintsugi3DBuilder/) | University research software for 3D texture reconstruction. I replaced crashes with clear warnings, fixed thread-freeze bugs and added image disabling for Metashape imports. | Java, JavaFX, Maven |
+| [Church website](https://www.gishendebrekerbe.com) | Built most of the original site in a 2-person team, plus a Sanity CMS so staff publish news and videos themselves. | Next.js, TypeScript, Sanity |
+| [UniMentor](https://github.com/CSTP2305-BlueMango/UniMentor) | iOS peer-tutoring app. I built sign-up, login, email verification and profile screens. | Swift, SwiftUI, Firebase |
 
 ---
 
@@ -55,13 +56,10 @@
 
 ### Let's connect
 
-<a href="mailto:YOUR_EMAIL">
+<a href="mailto:caosonminh2000@gmail.com">
   <img src="https://img.shields.io/badge/Email-00FF9C?style=for-the-badge&logo=gmail&logoColor=black" alt="Email" />
 </a>
-<a href="https://YOUR_WEBSITE">
-  <img src="https://img.shields.io/badge/Website-8B5CF6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Website" />
-</a>
-<a href="https://linkedin.com/in/YOUR_LINKEDIN">
+<a href="https://www.linkedin.com/in/simon-cao-135122197/">
   <img src="https://img.shields.io/badge/LinkedIn-3B82F6?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
 </a>
 
