@@ -13,17 +13,21 @@ TOP = 66      # animated blocks lay out from y≈100; their view starts here
 #   .c  the cursor: blinks
 #   .h  one heatmap column: fades in
 #   .a  a ring segment (pathLength=100): draws from nothing to its length
+#   .f  one in-between frame of a counting number: hidden except while its
+#       own animation runs, so with no animation only the final value shows
 STYLE = """<style>
   .o{animation:show .01s backwards}
   .k{animation:type .45s steps(14,end) backwards}
   .c{animation:blink 1.1s steps(1,end) infinite}
   .h{animation:show .3s cubic-bezier(.23,1,.32,1) backwards}
   .a{animation:draw .9s cubic-bezier(.23,1,.32,1) backwards}
+  .f{opacity:0;animation-name:flash;animation-timing-function:steps(1,end)}
   @keyframes show{from{opacity:0}}
   @keyframes type{from{clip-path:inset(-20% 100% -20% 0)}to{clip-path:inset(-20% 0 -20% 0)}}
   @keyframes blink{50%{opacity:0}}
   @keyframes draw{from{stroke-dasharray:0 100}}
-  @media (prefers-reduced-motion:reduce){.o,.k,.c,.h,.a{animation:none}}
+  @keyframes flash{from,to{opacity:1}}
+  @media (prefers-reduced-motion:reduce){.o,.k,.c,.h,.a,.f{animation:none}}
 </style>"""
 
 CLOSE = "</svg>"
@@ -72,6 +76,11 @@ def cell(x, y, size, radius, fill):
 def appear_at(ms, body):
     """`body`, appearing instantly `ms` milliseconds after load."""
     return f'<g class="o" style="animation-delay:{ms}ms">{body}</g>'
+
+
+def flash(ms, duration, body):
+    """`body`, visible only from `ms` for `duration` ms (one counting frame)."""
+    return f'<g class="f" style="animation-delay:{ms}ms;animation-duration:{duration}ms">{body}</g>'
 
 
 def typed(body, ms, chars):

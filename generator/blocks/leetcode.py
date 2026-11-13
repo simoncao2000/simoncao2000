@@ -8,7 +8,7 @@ week begins. That keeps the hourly CI job from committing every day.
 import datetime as dt
 
 from ..fonts import BOLD, MEDIUM, REGULAR
-from ..svg import EDGE, SIZE, WIDTH, CLOSE, animated, cell, document, prompt, text
+from ..svg import EDGE, SIZE, WIDTH, CLOSE, animated, appear_at, cell, document, flash, prompt, text
 
 HEIGHT = 340
 WEEKS = 53
@@ -29,6 +29,11 @@ BOX_W, BOX_H, BOX_GAP, BOX_PAD = 200, 44, 10, 16
 
 # When each step starts (ms after load).
 COMMAND_AT, RING_AT, GRID_AT, COLUMN_STEP = 150, 650, 650, 10
+
+# Solved numbers count up alongside the ring: same start, same 0.9 s, same
+# strong ease-out, so number and arc land together. Frames are capped so a
+# big count stays a small file.
+COUNT_MS, MAX_FRAMES = 900, 24
 
 
 def level(n):
@@ -87,20 +92,60 @@ def gauge(t, data):
     return faint + solid
 
 
+def ease_out(x):
+    """Quartic ease-out, close to the ring's cubic-bezier(.23,1,.32,1)."""
+    return 1 - (1 - x) ** 4
+
+
+def count_frames(n):
+    """[(start ms, duration ms, value)] for the in-between values on the way
+    to `n`. Frames are evenly spaced in time with eased values, so the count
+    races early and settles late; repeated values merge into one frame."""
+    steps = min(n, MAX_FRAMES)
+    frames = []
+    for k in range(steps):
+        start = RING_AT + COUNT_MS * k / steps
+        value = round(n * ease_out(k / steps))
+        if frames and frames[-1][2] == value:
+            frames[-1][1] += COUNT_MS / steps
+        else:
+            frames.append([start, COUNT_MS / steps, value])
+    return [(round(s), round(d), v) for s, d, v in frames if v != n]
+
+
+def counter(face, size, right, y, fill, n):
+    """`n` right-aligned to `right`, counting up from 0 on load. Each
+    in-between value only shows during its own frame; the final value is
+    what shows when there's no animation."""
+    def number(v):
+        return text(face, str(v), size, right - face.width(str(v), size), y, fill)
+    frames = count_frames(n)
+    if not frames:
+        return [number(n)]
+    return [flash(s, d, number(v)) for s, d, v in frames] + [appear_at(RING_AT + COUNT_MS, number(n))]
+
+
+def fraction(face, size, right, y, fill, solved, total):
+    """`solved/total` ending at `right`; only `solved` counts up, and it is
+    right-aligned to the slash so the digits never shift sideways."""
+    slash = right - face.width(f"/{total}", size)
+    return counter(face, size, slash, y, fill, solved) + [text(face, f"/{total}", size, slash, y, fill)]
+
+
 def gauge_centre(t, data):
     """`36/4110` and "Solved", centred in the ring."""
-    count = f'{data["solved"]["All"]}/{data["total"]["All"]}'
-    return [text(BOLD, count, 22, RING_X - BOLD.width(count, 22) / 2, RING_Y + 3, t["ink"]),
-            text(REGULAR, "Solved", TINY, RING_X - REGULAR.width("Solved", TINY) / 2, RING_Y + 28, t["muted"])]
+    s, q = data["solved"]["All"], data["total"]["All"]
+    right = RING_X + BOLD.width(f"{s}/{q}", 22) / 2
+    return fraction(BOLD, 22, right, RING_Y + 3, t["ink"], s, q) + [
+        text(REGULAR, "Solved", TINY, RING_X - REGULAR.width("Solved", TINY) / 2, RING_Y + 28, t["muted"])]
 
 
 def difficulty_box(t, d, solved, total, top):
     """One rounded box: the difficulty in its colour, `solved/total` on the right."""
-    value = f"{solved}/{total}"
     baseline = top + BOX_H / 2 + 6
     return [f'<rect x="{BOX_X}" y="{top}" width="{BOX_W}" height="{BOX_H}" rx="8" fill="{t["panel"]}"/>',
-            text(MEDIUM, SHORT[d], 18, BOX_X + BOX_PAD, baseline, t[d.lower()]),
-            text(REGULAR, value, 18, BOX_X + BOX_W - BOX_PAD - REGULAR.width(value, 18), baseline, t["ink"])]
+            text(MEDIUM, SHORT[d], 18, BOX_X + BOX_PAD, baseline, t[d.lower()])] + fraction(
+        REGULAR, 18, BOX_X + BOX_W - BOX_PAD, baseline, t["ink"], solved, total)
 
 
 def difficulty_boxes(t, data):
