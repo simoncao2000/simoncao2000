@@ -132,7 +132,7 @@ def contrast(a, b):
 def legible(fg, page, ratio=4.5):
     """Nudge fg toward black or white, keeping its hue, until it reads at
     `ratio` on the page. The art is transparent, so `page` is GitHub's own
-    background, not Catppuccin's base. Latte's maroon, teal, yellow and
+    background, not Catppuccin's base. Latte's pink, teal, yellow and
     overlay2 fall short on white; Mocha passes untouched."""
     target = "#000000" if luminance(page) > 0.5 else "#FFFFFF"
     k = 0.0
@@ -142,11 +142,11 @@ def legible(fg, page, ratio=4.5):
 
 
 def flavour(c, page):
-    roles = dict(ink=c["text"], muted=c["subtext0"], faint=c["overlay2"], prompt=c["maroon"], path=c["blue"],
+    roles = dict(ink=c["text"], muted=c["subtext0"], faint=c["overlay2"], prompt=c["pink"], path=c["blue"],
                  accent=c["blue"], easy=c["teal"], medium=c["yellow"], hard=c["red"])
     out = {k: legible(v, page) for k, v in roles.items()}
     # Heat cells are graphics, not text: keep Catppuccin's own green ramp.
-    out["heat"] = heat(c["empty"], c["base"], c["maroon"])
+    out["heat"] = heat(c["empty"], c["base"], c["pink"])
     # The status dot keeps green: it means "available", whatever the accent.
     out["ok"] = legible(c["green"], page, 3.0)
     return out
