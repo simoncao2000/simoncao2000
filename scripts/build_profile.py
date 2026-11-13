@@ -110,9 +110,11 @@ def heat(empty, base, green, steps=(0.35, 0.6, 0.8, 1.0)):
     return [empty] + [mix(base, green, k) for k in steps]
 
 
-LATTE = dict(base="#EFF1F5", surface0="#CCD0DA", empty="#E6E9EF", text="#4C4F69", subtext0="#6C6F85", overlay2="#7C7F93",
+# Empty heatmap cells: Latte crust on white, Mocha mantle on GitHub dark.
+# (Mocha crust is 1.01:1 against #0D1117 and disappears; Latte mantle washes out on white.)
+LATTE = dict(base="#EFF1F5", surface0="#CCD0DA", empty="#DCE0E8", text="#4C4F69", subtext0="#6C6F85", overlay2="#7C7F93",
              pink="#EA76CB", green="#40A02B", blue="#1E66F5", mauve="#8839EF", teal="#179299", yellow="#DF8E1D", red="#D20F39")
-MOCHA = dict(base="#1E1E2E", surface0="#313244", empty="#313244", text="#CDD6F4", subtext0="#A6ADC8", overlay2="#9399B2",
+MOCHA = dict(base="#1E1E2E", surface0="#313244", empty="#181825", text="#CDD6F4", subtext0="#A6ADC8", overlay2="#9399B2",
              pink="#F5C2E7", green="#A6E3A1", blue="#89B4FA", mauve="#CBA6F7", teal="#94E2D5", yellow="#F9E2AF", red="#F38BA8")
 
 
