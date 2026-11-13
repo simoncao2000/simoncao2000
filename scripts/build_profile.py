@@ -4,8 +4,15 @@ Every string is outlined to SVG paths in JetBrains Mono, so the images look
 the same on every device. LeetCode stats are fetched live; if LeetCode is
 unreachable, the existing LeetCode cards are left untouched.
 
-    pip install fonttools uharfbuzz
+    pip install -r scripts/requirements.txt
     python scripts/build_profile.py
+
+Outputs (all in assets/, one -light and one -dark file each):
+    hero        whoami + name heatmap + cat profile.txt
+    projects    the `ls -l ~/projects` header line
+    <slug>      one linked row per project
+    stack       cat stack.txt
+    leetcode    solved counts + 53-week heatmap (rebuilt hourly by CI)
 """
 import datetime as dt
 import json
@@ -29,6 +36,9 @@ FALLBACK_NAME = "Simon Cao"
 
 # --------------------------------------------------------------------- type
 def font_file():
+    """Return the local JetBrains Mono file, downloading it on first run.
+
+    The font is cached in scripts/.fonts (git-ignored; cached in CI too)."""
     FONT_DIR.mkdir(exist_ok=True)
     path = FONT_DIR / "JetBrainsMono.ttf"
     if not path.exists():
@@ -37,7 +47,15 @@ def font_file():
 
 
 class Face:
+    """One weight of a variable font that can measure text and turn it into
+    SVG path data.
+
+    HarfBuzz does the shaping (glyph choice and spacing); fontTools supplies
+    the outlines from a static instance at the same weight, so measured
+    widths and drawn glyphs always agree."""
+
     def __init__(self, path, weight):
+        """Load `path` and pin its `wght` axis to `weight` (100–800)."""
         coords = {"wght": weight}
         self.hbfont = hb.Font(hb.Face(hb.Blob.from_file_path(str(path))))
         self.hbfont.set_variations(coords)
@@ -47,6 +65,10 @@ class Face:
         self.order = static.getGlyphOrder()
 
     def _shape(self, text):
+        """Shape `text` and return HarfBuzz (glyph infos, glyph positions).
+
+        Ligatures and contextual alternates are off so `->` or `!=` stay as
+        typed, the way a terminal shows them."""
         buf = hb.Buffer()
         buf.add_str(text)
         buf.guess_segment_properties()
@@ -54,11 +76,16 @@ class Face:
         return buf.glyph_infos, buf.glyph_positions
 
     def width(self, text, size):
+        """Advance width of `text` at `size` px, in SVG units."""
         if not text:
             return 0
         return sum(p.x_advance for p in self._shape(text)[1]) * size / self.upem
 
     def path(self, text, size, x, y):
+        """SVG path data for `text` with its baseline starting at (x, y).
+
+        Font units are scaled to `size` and flipped (fonts are y-up, SVG is
+        y-down). Coordinates are rounded to 0.1 px to keep files small."""
         infos, pos = self._shape(text)
         s = size / self.upem
         pen = SVGPathPen(self.glyphset)
@@ -73,18 +100,25 @@ class Face:
 
 
 FONT = font_file()
-mono = Face(FONT, 400)
-mono_md = Face(FONT, 600)
-mono_bd = Face(FONT, 760)
+mono = Face(FONT, 400)     # body text
+mono_md = Face(FONT, 600)  # prompt
+mono_bd = Face(FONT, 760)  # project names, big numbers
 
 
 def text(face, s, size, x, y, fill, extra=""):
+    """An SVG <path> element drawing `s` in `fill`; empty string for no text.
+
+    `extra` is spliced into the tag for additional attributes."""
     if not s:
         return ""
     return f'<path{extra} fill="{fill}" d="{face.path(s, size, x, y)}"/>'
 
 
 def wrap(face, s, size, maxw):
+    """Greedy word wrap: split `s` into lines no wider than `maxw`.
+
+    A single word longer than `maxw` gets a line to itself rather than
+    being broken."""
     lines, cur = [], ""
     for word in s.split():
         trial = f"{cur} {word}".strip()
@@ -106,8 +140,12 @@ def mix(a, b, k):
     return "#" + "".join(f"{round(x + (y - x) * k):02X}" for x, y in zip(ca, cb))
 
 
-def heat(empty, base, green, steps=(0.35, 0.6, 0.8, 1.0)):
-    return [empty] + [mix(base, green, k) for k in steps]
+def heat(empty, base, accent, steps=(0.35, 0.6, 0.8, 1.0)):
+    """Five heatmap shades, index = activity level 0–4.
+
+    Level 0 is `empty`; levels 1–4 blend from the flavour's `base` toward
+    `accent` by `steps`, so the ramp stays inside the Catppuccin palette."""
+    return [empty] + [mix(base, accent, k) for k in steps]
 
 
 # Empty heatmap cells: Latte crust on white, Mocha mantle on GitHub dark.
@@ -119,12 +157,14 @@ MOCHA = dict(base="#1E1E2E", surface0="#313244", empty="#181825", text="#CDD6F4"
 
 
 def luminance(h):
+    """WCAG relative luminance of a hex colour (0 = black, 1 = white)."""
     c = [int(h[i:i + 2], 16) / 255 for i in (1, 3, 5)]
     c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
     return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
 
 
 def contrast(a, b):
+    """WCAG contrast ratio between two hex colours (1:1 up to 21:1)."""
     hi, lo = sorted((luminance(a), luminance(b)), reverse=True)
     return (hi + 0.05) / (lo + 0.05)
 
@@ -142,10 +182,15 @@ def legible(fg, page, ratio=4.5):
 
 
 def flavour(c, page):
+    """Map a Catppuccin flavour onto the roles the drawings use.
+
+    Text roles are passed through `legible` for `page` (GitHub's background
+    in that mode). Returns ink/muted/faint text, prompt, path, accent (project
+    names), easy/medium/hard, heat (5 shades) and ok (status dot)."""
     roles = dict(ink=c["text"], muted=c["subtext0"], faint=c["overlay2"], prompt=c["pink"], path=c["blue"],
                  accent=c["blue"], easy=c["teal"], medium=c["yellow"], hard=c["red"])
     out = {k: legible(v, page) for k, v in roles.items()}
-    # Heat cells are graphics, not text: keep Catppuccin's own green ramp.
+    # Heat cells are graphics, not text: keep Catppuccin's own pink ramp.
     out["heat"] = heat(c["empty"], c["base"], c["pink"])
     # The status dot keeps green: it means "available", whatever the accent.
     out["ok"] = legible(c["green"], page, 3.0)
@@ -158,6 +203,12 @@ T = {"light": flavour(LATTE, "#FFFFFF"), "dark": flavour(MOCHA, "#0D1117")}
 # own headings and text; 2 keeps rounded cells clear of the image edge.
 EDGE = 2
 
+# Shared CSS for the animated SVGs. Every class animates *from* hidden with
+# `backwards` fill, so anything that can't run CSS shows the finished frame.
+#   .o  output lines: appear instantly, as a terminal prints
+#   .k  a typed command: revealed one character per step
+#   .c  the cursor: blinks
+#   .h  one heatmap column: fades in
 STYLE = """<style>
   .o{animation:show .01s backwards}
   .k{animation:type .45s steps(14,end) backwards}
@@ -171,10 +222,12 @@ STYLE = """<style>
 
 
 def window(w, h, t, title, label, top=66):
-    """Frameless terminal output on the page's own ground.
+    """Opening tags for an animated, frameless terminal block.
 
     Callers lay content out from y≈100; the viewBox starts at `top` so the
-    first line lands where the project rows' first line does.
+    first line lands where the project rows' first line does. `label` is the
+    accessible description. `t` and `title` are unused since the window
+    chrome was removed; kept so callers didn't need to change.
     """
     return [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 {top} {w} {h - top}" width="{w}" height="{h - top}" '
@@ -185,7 +238,11 @@ def window(w, h, t, title, label, top=66):
 
 
 def prompt(t, x, y, size, command, delay=None):
-    """`simon@cao:~$ command` — the command types out when a delay is given."""
+    """Draw `simon@cao:~$ command` at (x, y).
+
+    With `delay` (ms), the prompt appears just before that moment and the
+    command types out one character per step. Returns (svg, x where the
+    line ends), so a caller can place the cursor after it."""
     parts, cx = [], x
     for s, c in (("simon@cao", t["prompt"]), (":", t["ink"]), ("~", t["path"]), ("$ ", t["ink"])):
         parts.append(text(mono_md, s, size, cx, y, c))
@@ -200,12 +257,14 @@ def prompt(t, x, y, size, command, delay=None):
 
 
 def later(ms, body):
+    """Wrap `body` so it appears instantly `ms` milliseconds after load."""
     return f'<g class="o" style="animation-delay:{ms}ms">{body}</g>'
 
 
 # --------------------------------------------------------------------- hero
-# 5x7 pixel letters; "SIMON CAO" spans 52 columns, one short of a
-# contribution graph's 53 weeks, so the name sits on a real-sized grid.
+# 5x7 pixel letters ("#" lit, "." empty). With 2-column gaps between letters
+# and a 3-column space, "SIMON CAO" fills exactly 53 columns: the width of a
+# year-long contribution graph.
 GLYPHS = {
     "S": [".####", "#....", "#....", ".###.", "....#", "....#", "####."],
     "I": ["###", ".#.", ".#.", ".#.", ".#.", ".#.", "###"],
@@ -219,6 +278,7 @@ GLYPHS = {
 
 
 def name_bitmap(name, cols=53):
+    """Spell `name` in GLYPHS as 7 strings of "#"/".", centred in `cols`."""
     rows = [""] * 7
     for i, ch in enumerate(name.upper()):
         g = GLYPHS[ch]
@@ -230,12 +290,21 @@ def name_bitmap(name, cols=53):
 
 
 def lcg(seed):
+    """Endless deterministic numbers in [0, 1).
+
+    A fixed seed gives the same "random" shading every build, so the hero
+    SVG never changes unless the design does (and CI doesn't commit it)."""
     while True:
         seed = (seed * 1103515245 + 12345) & 0x7FFFFFFF
         yield seed / 0x7FFFFFFF
 
 
 def name_heatmap(t, x, y, pitch, cell, start_ms):
+    """The name drawn as a contribution heatmap, top-left at (x, y).
+
+    Letter cells get the two brightest levels; about 4% of background cells
+    get level 1 so it reads like real activity. Columns fade in left to
+    right, 12 ms apart, starting at `start_ms`."""
     bits = name_bitmap("Simon Cao")
     rnd = lcg(2000)
     cols = []
@@ -251,6 +320,7 @@ def name_heatmap(t, x, y, pitch, cell, start_ms):
 
 
 def hero(theme):
+    """The top block: `whoami` → name heatmap → tagline → `cat profile.txt`."""
     t = T[theme]
     W, H = 1280, 690
     s = window(W, H, t, "simon@cao: ~",
@@ -311,11 +381,13 @@ ROW_X, ROW_SZ = EDGE, 22
 
 
 def bare(w, h, label):
+    """Opening tags for a static (unanimated) SVG described by `label`."""
     return [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" role="img" aria-labelledby="t">',
             f"<title id=\"t\">{label}</title>"]
 
 
 def projects_head(theme):
+    """The `ls -l ~/projects` command and its `total 4` line."""
     t = T[theme]
     s = bare(1280, 84, "simon@cao:~$ ls -l ~/projects, total 4")
     p, _ = prompt(t, ROW_X, 34, ROW_SZ, "ls -l ~/projects")
@@ -324,6 +396,9 @@ def projects_head(theme):
 
 
 def project_row(p, theme):
+    """One `ls -l` entry: permissions, date, name/ ↗, description, # stack.
+
+    The description wraps under the name column; the image grows to fit."""
     t = T[theme]
     W, sz = 1280, ROW_SZ
     nx = ROW_X + mono.width("drwxr-xr-x  May 2026  ", sz)
@@ -357,6 +432,7 @@ STACK = [
 
 
 def stack_window(theme):
+    """`cat stack.txt`: one labelled line per STACK group."""
     t = T[theme]
     W, sz = 1280, ROW_SZ
     kx = ROW_X + mono.width("frameworks  ", sz)
@@ -375,6 +451,11 @@ def stack_window(theme):
 
 # ----------------------------------------------------------------- leetcode
 def fetch_leetcode(user):
+    """Fetch public stats for `user` from LeetCode's GraphQL endpoint.
+
+    Returns {name, solved, total, cal}: solved and total map "All"/"Easy"/
+    "Medium"/"Hard" to counts; cal maps each UTC date to its submission
+    count. Raises on any network or format error (main() handles that)."""
     q = ("query($u:String!){matchedUser(username:$u){profile{realName} "
          "submitStatsGlobal{acSubmissionNum{difficulty count}} userCalendar{submissionCalendar}} "
          "allQuestionsCount{difficulty count}}")
@@ -395,10 +476,14 @@ def fetch_leetcode(user):
 
 
 def level(n):
+    """Heatmap level 0–4 for `n` submissions in a day: 0, 1–2, 3–5, 6–10, 11+."""
     return 0 if n == 0 else 1 if n <= 2 else 2 if n <= 5 else 3 if n <= 10 else 4
 
 
 def leetcode(data, theme, today):
+    """The LeetCode block: solved counts on the left, heatmap on the right.
+
+    `data` comes from fetch_leetcode; `today` is a UTC date."""
     t = T[theme]
     W, H = 1280, 340
     # The grid covers whole weeks: 52 past weeks plus the current one, drawn
@@ -409,7 +494,7 @@ def leetcode(data, theme, today):
     yr = sum(v for d, v in data["cal"].items() if start <= d <= end)
     label = (f'LeetCode stats: {data["solved"]["All"]} problems solved '
              f'({data["solved"]["Easy"]} easy, {data["solved"]["Medium"]} medium, {data["solved"]["Hard"]} hard). '
-             f"{yr} submissions in the past year.")
+             f"{yr} submissions in the past 53 weeks.")
     s = window(W, H, t, "simon@cao: ~/leetcode", label)
     x, sz = EDGE, 22
     p, _ = prompt(t, x, 100, sz, "leetcode stats --year")
@@ -459,6 +544,11 @@ def leetcode(data, theme, today):
 
 # --------------------------------------------------------------------- main
 def main():
+    """Write every SVG to assets/.
+
+    The static blocks are rebuilt every run (their output is identical
+    unless the design changes). The LeetCode cards are only rewritten when
+    the fetch succeeds, so an outage never replaces good data."""
     OUT.mkdir(exist_ok=True)
     for th in T:
         (OUT / f"hero-{th}.svg").write_text(hero(th), encoding="utf-8")
