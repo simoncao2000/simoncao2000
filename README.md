@@ -1,47 +1,29 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=8B5CF6,3B82F6,00FF9C&height=240&section=header&text=Simon%20Cao&fontSize=56&fontColor=ffffff&fontAlignY=38&desc=Full-Stack%20Software%20Engineer&descAlign=50&descAlignY=58&animation=fadeIn" width="100%" alt="Header banner" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:FFC8DD,50:CDB4FF,100:BDE0FE&height=230&section=header&text=Simon%20Cao&fontSize=60&fontColor=4A3F6B&fontAlignY=38&desc=Full-stack%20software%20engineer&descSize=20&descAlignY=58&animation=fadeIn" width="100%" alt="Simon Cao, full-stack software engineer" />
 
 <a href="https://git.io/typing-svg">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=22&pause=1000&color=00FF9C&center=true&vCenter=true&width=640&lines=Full-stack+engineer:+React,+TypeScript,+Python;Building+Python+%2B+AWS+integrations+at+ShyftFi;Exploring+agentic+AI+tools+like+Claude+Code" alt="Typing animation" />
+  <img src="https://readme-typing-svg.demolab.com?font=Sora&weight=500&size=20&duration=3200&pause=900&color=7A68B3&center=true&vCenter=true&width=620&lines=I+build+web+apps+people+can+rely+on;Python+%2B+AWS+integrations+at+ShyftFi;React%2C+TypeScript+and+Next.js+on+the+front+end" alt="I build web apps people can rely on. Python and AWS integrations at ShyftFi. React, TypeScript and Next.js on the front end." />
 </a>
 
 </div>
 
----
+I care most about two groups of people: the ones on the other side of the screen, and the teammates who read my code next. I graduated with a B.S. in Computer Science from the University of Wisconsin–Stout in 2026, and I'm looking for a full-time software engineering role.
 
 ## About me
 
-- **Role:** Full-stack software engineer, B.S. Computer Science, University of Wisconsin–Stout (2026)
-- **Building:** Python integrations between Odoo and AWS as a Software Development Intern at ShyftFi
-- **Currently learning:** Python backends and agentic AI
-- **Open to:** Full-time software engineering roles (full-stack or front-end)
-- **Fun fact:** I speak English and Vietnamese, and I led my university's Habitat for Humanity chapter
+- **Now:** Software Development Intern at ShyftFi, building Python integrations between Odoo and AWS
+- **Focus:** full-stack and front-end web apps with React, TypeScript and Next.js
+- **Learning:** Python backends and agentic AI tools like Claude Code
+- **Off the keyboard:** I led my university's Habitat for Humanity chapter, volunteer at an animal shelter, and speak English and Vietnamese
 
 ## Tech stack
 
 <p>
-  <img src="https://skillicons.dev/icons?i=ts,js,py,java,react,nextjs,tailwind,swift,mysql,mongodb,firebase,aws,git,github,figma&theme=dark&perline=8" alt="Tech stack icons" />
+  <img src="https://skillicons.dev/icons?i=ts,js,py,java,react,nextjs,tailwind,swift,mysql,mongodb,firebase,aws,git,github,figma&theme=light&perline=8" alt="TypeScript, JavaScript, Python, Java, React, Next.js, Tailwind CSS, Swift, MySQL, MongoDB, Firebase, AWS, Git, GitHub, Figma" />
 </p>
 
-## GitHub stats
-
-<div align="center">
-
-<img height="180" alt="GitHub stats" src="https://github-readme-stats.vercel.app/api?username=simoncao2000&show_icons=true&theme=tokyonight&hide_border=true&bg_color=0d1117&title_color=00FF9C&icon_color=8B5CF6&text_color=c9d1d9" />
-<img height="180" alt="Top languages" src="https://github-readme-stats.vercel.app/api/top-langs/?username=simoncao2000&layout=compact&langs_count=8&theme=tokyonight&hide_border=true&bg_color=0d1117&title_color=00FF9C&text_color=c9d1d9" />
-
-<br />
-
-<img height="180" alt="GitHub streak" src="https://streak-stats.demolab.com/?user=simoncao2000&theme=tokyonight&hide_border=true&background=0d1117&ring=00FF9C&fire=8B5CF6&currStreakLabel=00FF9C" />
-
-<br />
-
-<img width="100%" alt="Contribution graph" src="https://github-readme-activity-graph.vercel.app/graph?username=simoncao2000&theme=react-dark&hide_border=true&bg_color=0d1117&line=00FF9C&point=8B5CF6&area=true&radius=4" />
-
-</div>
-
-## Featured projects
+## Things I've built
 
 | Project | What I did | Stack |
 |---|---|---|
@@ -50,19 +32,15 @@
 | [Church website](https://www.gishendebrekerbe.com) | Built most of the original site in a 2-person team, plus a Sanity CMS so staff publish news and videos themselves. | Next.js, TypeScript, Sanity |
 | [UniMentor](https://github.com/CSTP2305-BlueMango/UniMentor) | iOS peer-tutoring app. I built sign-up, login, email verification and profile screens. | Swift, SwiftUI, Firebase |
 
----
-
 <div align="center">
 
-### Let's connect
+<img src="https://streak-stats.demolab.com/?user=simoncao2000&hide_border=true&border_radius=18&background=FFF7FB&stroke=E8DDFB&ring=CDB4FF&fire=FF8FB7&currStreakNum=4A3F6B&sideNums=4A3F6B&currStreakLabel=7A68B3&sideLabels=7A68B3&dates=8C84A8" alt="Simon's GitHub contribution streak" />
 
-<a href="mailto:caosonminh2000@gmail.com">
-  <img src="https://img.shields.io/badge/Email-00FF9C?style=for-the-badge&logo=gmail&logoColor=black" alt="Email" />
-</a>
-<a href="https://www.linkedin.com/in/simon-cao-135122197/">
-  <img src="https://img.shields.io/badge/LinkedIn-3B82F6?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
-</a>
+### Let's talk
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=8B5CF6,3B82F6,00FF9C&height=120&section=footer" width="100%" alt="Footer" />
+<a href="mailto:caosonminh2000@gmail.com"><img src="https://img.shields.io/badge/Email-FFC8DD?style=for-the-badge&logo=gmail&logoColor=4A3F6B" alt="Email Simon" /></a>
+<a href="https://www.linkedin.com/in/simon-cao-135122197/"><img src="https://img.shields.io/badge/LinkedIn-BDE0FE?style=for-the-badge&logo=linkedin&logoColor=4A3F6B" alt="Simon on LinkedIn" /></a>
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:BDE0FE,50:CDB4FF,100:FFC8DD&height=110&section=footer" width="100%" alt="" />
 
 </div>
