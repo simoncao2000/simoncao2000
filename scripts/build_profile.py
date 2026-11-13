@@ -349,7 +349,12 @@ def level(n):
 def leetcode(data, theme, today):
     t = T[theme]
     W, H = 1280, 340
-    yr = sum(v for d, v in data["cal"].items() if (today - d).days < 365)
+    # The grid covers whole weeks: 52 past weeks plus the current one, drawn
+    # through Saturday. Nothing in the card depends on the day of the week, so
+    # the SVG only changes when the stats do (or a new week begins).
+    start = today - dt.timedelta(days=(today.weekday() + 1) % 7 + 52 * 7)
+    end = start + dt.timedelta(days=53 * 7 - 1)
+    yr = sum(v for d, v in data["cal"].items() if start <= d <= end)
     label = (f'LeetCode stats: {data["solved"]["All"]} problems solved '
              f'({data["solved"]["Easy"]} easy, {data["solved"]["Medium"]} medium, {data["solved"]["Hard"]} hard). '
              f"{yr} submissions in the past year.")
@@ -370,10 +375,9 @@ def leetcode(data, theme, today):
     # right column: 53-week heatmap ending today, weeks start on Sunday
     gx, gy, cell, gap = 432, 168, 12, 3
     pitch = cell + gap
-    start = today - dt.timedelta(days=(today.weekday() + 1) % 7 + 52 * 7)
     cells, months, last_col = [], [], -9
     day, col = start, 0
-    while day <= today:
+    while day <= end:
         row = (day.weekday() + 1) % 7
         if day.day <= 7 and row == 0 and col - last_col >= 3:
             months.append((col, day.strftime("%b")))
@@ -390,7 +394,7 @@ def leetcode(data, theme, today):
     # legend
     lx = gx + 53 * pitch - 5 * pitch - mono.width("less ", 15) - mono.width(" more", 15)
     ly = gy + 7 * pitch + 30
-    s.append(text(mono, f"{yr} submissions in the past year", 17, gx, ly + 12, t["muted"]))
+    s.append(text(mono, f"{yr} submissions in the past 53 weeks", 17, gx, ly + 12, t["muted"]))
     s.append(text(mono, "less", 15, lx, ly + 11, t["faint"]))
     lx += mono.width("less ", 15)
     for i in range(5):
