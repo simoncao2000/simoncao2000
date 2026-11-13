@@ -121,19 +121,17 @@ STYLE = """<style>
 </style>"""
 
 
-def window(w, h, t, title, label):
-    """Terminal window chrome: rounded frame, title bar, three neutral dots."""
+def window(w, h, t, title, label, top=66):
+    """Frameless terminal output on the page's own ground.
+
+    Callers lay content out from y≈100; the viewBox starts at `top` so the
+    first line lands where the project rows' first line does.
+    """
     return [
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" role="img" aria-labelledby="t">',
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 {top} {w} {h - top}" width="{w}" height="{h - top}" '
+        f'role="img" aria-labelledby="t">',
         f"<title id=\"t\">{label}</title>",
         STYLE,
-        f'<clipPath id="f"><rect width="{w}" height="{h}" rx="14"/></clipPath>',
-        f'<g clip-path="url(#f)"><rect width="{w}" height="{h}" fill="{t["bg"]}"/>'
-        f'<rect width="{w}" height="44" fill="{t["bar"]}"/>'
-        f'<path d="M0 44H{w}" stroke="{t["border"]}" stroke-width="1.5"/></g>',
-        f'<rect x=".75" y=".75" width="{w-1.5}" height="{h-1.5}" rx="14" fill="none" stroke="{t["border"]}" stroke-width="1.5"/>',
-        "".join(f'<circle cx="{26 + i*20}" cy="22" r="6" fill="{t["dot"]}"/>' for i in range(3)),
-        text(mono, title, 15, (w - mono.width(title, 15)) / 2, 27, t["faint"]),
     ]
 
 
@@ -241,60 +239,86 @@ def hero(theme):
 
 
 # ----------------------------------------------------------------- projects
+# Rendered as `ls -l` output straight on the page (transparent ground), one
+# image per row so each row links to its project.
 PROJECTS = [
-    dict(slug="manifest-editor", dir="manifest-editor",
+    dict(slug="manifest-editor", dir="manifest-editor", date="May 2026",
          body="Browser editor for IIIF manifests and 3D scenes, built for stakeholders in London.",
-         stack="react · typescript · indexeddb"),
-    dict(slug="kintsugi", dir="kintsugi3d-builder",
+         stack="react · typescript · tailwind · indexeddb"),
+    dict(slug="kintsugi", dir="kintsugi3d-builder", date="May 2026",
          body="Research software for 3D texture reconstruction at UW–Stout.",
          stack="java · javafx · maven"),
-    dict(slug="church-site", dir="gishen-debre-kerbe",
+    dict(slug="church-site", dir="gishen-debre-kerbe", date="Aug 2023",
          body="Website and content management system for a church community.",
          stack="next.js · typescript · sanity"),
-    dict(slug="unimentor", dir="unimentor",
+    dict(slug="unimentor", dir="unimentor", date="Sep 2022",
          body="iOS app that connects university students with peer tutors.",
          stack="swift · swiftui · firebase"),
 ]
+ROW_X, ROW_SZ = 48, 22
 
 
-def card(p, theme):
+def bare(w, h, label):
+    return [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" role="img" aria-labelledby="t">',
+            f"<title id=\"t\">{label}</title>"]
+
+
+def projects_head(theme):
     t = T[theme]
-    W, H = 600, 300
-    label = f'{p["dir"]}: {p["body"]} Built with {p["stack"].replace(" · ", ", ")}.'
-    s = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-labelledby="t">',
-         f'<title id="t">{label}</title>',
-         f'<rect x=".75" y=".75" width="{W-1.5}" height="{H-1.5}" rx="14" fill="{t["bg"]}" stroke="{t["border"]}" stroke-width="1.5"/>']
-    # "~/dir/" heading, with the arrow that says "this opens"
-    s.append(text(mono_md, "~/", 26, 40, 74, t["faint"]))
-    s.append(text(mono_bd, p["dir"] + "/", 26, 40 + mono_md.width("~/", 26), 74, t["path"]))
-    s.append(f'<path d="M{W-56} {64}L{W-42} {50}M{W-52} {50}H{W-42}V{60}" fill="none" stroke="{t["faint"]}" '
+    s = bare(1280, 84, "simon@cao:~$ ls -l ~/projects, total 4")
+    p, _ = prompt(t, ROW_X, 34, ROW_SZ, "ls -l ~/projects")
+    s += [p, text(mono, "total 4", ROW_SZ, ROW_X, 72, t["faint"]), "</svg>"]
+    return "\n".join(s)
+
+
+def project_row(p, theme):
+    t = T[theme]
+    W, sz = 1280, ROW_SZ
+    nx = ROW_X + mono.width("drwxr-xr-x  May 2026  ", sz)
+    lines = wrap(mono, p["body"], sz, W - 48 - nx)
+    H = 52 + 34 * len(lines) + 40
+    label = f'{p["dir"]}, {p["date"]}: {p["body"]} Built with {p["stack"].replace(" · ", ", ")}.'
+    s = bare(W, H, label)
+    s.append(text(mono, "drwxr-xr-x", sz, ROW_X, 34, t["faint"]))
+    s.append(text(mono, p["date"], sz, ROW_X + mono.width("drwxr-xr-x  ", sz), 34, t["muted"]))
+    s.append(text(mono_bd, p["dir"] + "/", sz, nx, 34, t["path"]))
+    ax = nx + mono_bd.width(p["dir"] + "/", sz) + 14
+    s.append(f'<path d="M{ax} 32L{ax+12} 20M{ax+3} 20H{ax+12}V29" fill="none" stroke="{t["path"]}" '
              f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>')
-    y = 124
-    for line in wrap(mono, p["body"], 21, W - 80):
-        s.append(text(mono, line, 21, 40, y, t["muted"]))
-        y += 32
-    s.append(f'<path d="M40 {H-74}H{W-40}" stroke="{t["border"]}" stroke-width="1.5"/>')
-    s.append(text(mono, p["stack"], 19, 40, H - 38, t["faint"]))
+    y = 34 + 36
+    for line in lines:
+        s.append(text(mono, line, sz, nx, y, t["ink"]))
+        y += 34
+    s.append(text(mono, "# " + p["stack"], sz, nx, y, t["faint"]))
     s.append("</svg>")
     return "\n".join(s)
 
 
-# ------------------------------------------------------------------ buttons
-def button(label, kind, theme):
+# -------------------------------------------------------------------- stack
+# Straight from the resume's Technical Skills section.
+STACK = [
+    ("languages", "TypeScript, JavaScript, Python, Java, SQL, Swift, HTML/CSS"),
+    ("frameworks", "React, Next.js, React Router, Tailwind CSS, Odoo, JavaFX, SwiftUI"),
+    ("data", "IndexedDB, Firebase, Sanity CMS, MySQL, MongoDB"),
+    ("tools", "AWS, Git, GitHub, Jira, Vite, Maven, Figma, Claude Code, Codex"),
+]
+
+
+def stack_window(theme):
     t = T[theme]
-    size, h = 21, 56
-    w = round(26 + 22 + 12 + mono_md.width(label, size) + 28)
-    icon = {
-        "mail": '<rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/>',
-        "out": '<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/>',
-    }[kind]
-    return "\n".join([
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" width="{w}" height="{h}" role="img" aria-label="{label}">',
-        f'<rect x=".75" y=".75" width="{w-1.5}" height="{h-1.5}" rx="10" fill="{t["bg"]}" stroke="{t["border"]}" stroke-width="1.5"/>',
-        f'<g transform="translate(26 {h/2 - 11}) scale(.92)" fill="none" stroke="{t["prompt"]}" stroke-width="1.8" '
-        f'stroke-linecap="round" stroke-linejoin="round">{icon}</g>',
-        text(mono_md, label, size, 60, h / 2 + 7.5, t["ink"]),
-        "</svg>"])
+    W, sz = 1280, ROW_SZ
+    kx = ROW_X + mono.width("frameworks  ", sz)
+    H = 44 + 56 + 36 * len(STACK) + 34
+    label = "simon@cao:~$ cat stack.txt. " + " ".join(f"{k}: {v}." for k, v in STACK)
+    s = window(W, H, t, "simon@cao: ~", label)
+    p, _ = prompt(t, ROW_X, 100, sz, "cat stack.txt")
+    s.append(p)
+    for i, (k, v) in enumerate(STACK):
+        y = 146 + i * 36
+        s.append(text(mono, k, sz, ROW_X, y, t["faint"]))
+        s.append(text(mono, v, sz, kx, y, t["ink"]))
+    s.append("</svg>")
+    return "\n".join(s)
 
 
 # ----------------------------------------------------------------- leetcode
@@ -324,9 +348,9 @@ def level(n):
 
 def leetcode(data, theme, today):
     t = T[theme]
-    W, H = 1280, 380
+    W, H = 1280, 340
     yr = sum(v for d, v in data["cal"].items() if (today - d).days < 365)
-    label = (f'LeetCode stats for {data["name"]}: {data["solved"]["All"]} problems solved '
+    label = (f'LeetCode stats: {data["solved"]["All"]} problems solved '
              f'({data["solved"]["Easy"]} easy, {data["solved"]["Medium"]} medium, {data["solved"]["Hard"]} hard). '
              f"{yr} submissions in the past year.")
     s = window(W, H, t, "simon@cao: ~/leetcode", label)
@@ -334,13 +358,12 @@ def leetcode(data, theme, today):
     p, _ = prompt(t, x, 100, sz, "leetcode stats --year")
     s.append(p)
 
-    # left column: name, total, per-difficulty
-    s.append(text(mono_bd, data["name"], 34, x, 162, t["ink"]))
+    # left column: total, per-difficulty
     total = str(data["solved"]["All"])
-    s.append(text(mono_bd, total, 48, x, 232, t["ink"]))
-    s.append(text(mono, "solved", sz, x + mono_bd.width(total, 48) + 14, 232, t["muted"]))
+    s.append(text(mono_bd, total, 48, x, 196, t["ink"]))
+    s.append(text(mono, "solved", sz, x + mono_bd.width(total, 48) + 14, 196, t["muted"]))
     for i, d in enumerate(("Easy", "Medium", "Hard")):
-        y = 278 + i * 32
+        y = 242 + i * 32
         s.append(text(mono_md, d.lower(), 20, x, y, t[d.lower()]))
         s.append(text(mono, f'{data["solved"][d]:>4} / {data["total"][d]}', 20, x + mono.width("medium ", 20), y, t["muted"]))
 
@@ -382,10 +405,10 @@ def main():
     OUT.mkdir(exist_ok=True)
     for th in T:
         (OUT / f"hero-{th}.svg").write_text(hero(th), encoding="utf-8")
+        (OUT / f"projects-{th}.svg").write_text(projects_head(th), encoding="utf-8")
         for p in PROJECTS:
-            (OUT / f"{p['slug']}-{th}.svg").write_text(card(p, th), encoding="utf-8")
-        (OUT / f"email-{th}.svg").write_text(button("Email", "mail", th), encoding="utf-8")
-        (OUT / f"linkedin-{th}.svg").write_text(button("LinkedIn", "out", th), encoding="utf-8")
+            (OUT / f"{p['slug']}-{th}.svg").write_text(project_row(p, th), encoding="utf-8")
+        (OUT / f"stack-{th}.svg").write_text(stack_window(th), encoding="utf-8")
     try:
         data = fetch_leetcode(LEETCODE_USER)
     except Exception as e:  # keep the last good card when LeetCode is unreachable
@@ -394,7 +417,7 @@ def main():
     today = dt.datetime.now(dt.timezone.utc).date()
     for th in T:
         (OUT / f"leetcode-{th}.svg").write_text(leetcode(data, th, today), encoding="utf-8")
-    print(f"LeetCode: {data['name']}, {data['solved']['All']} solved")
+    print(f"LeetCode: {data['solved']['All']} solved")
 
 
 if __name__ == "__main__":
