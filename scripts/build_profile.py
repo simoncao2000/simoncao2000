@@ -111,9 +111,9 @@ def heat(empty, base, green, steps=(0.35, 0.6, 0.8, 1.0)):
 
 
 LATTE = dict(base="#EFF1F5", surface0="#CCD0DA", empty="#E6E9EF", text="#4C4F69", subtext0="#6C6F85", overlay2="#7C7F93",
-             green="#40A02B", blue="#1E66F5", mauve="#8839EF", teal="#179299", yellow="#DF8E1D", red="#D20F39")
+             pink="#EA76CB", green="#40A02B", blue="#1E66F5", mauve="#8839EF", teal="#179299", yellow="#DF8E1D", red="#D20F39")
 MOCHA = dict(base="#1E1E2E", surface0="#313244", empty="#313244", text="#CDD6F4", subtext0="#A6ADC8", overlay2="#9399B2",
-             green="#A6E3A1", blue="#89B4FA", mauve="#CBA6F7", teal="#94E2D5", yellow="#F9E2AF", red="#F38BA8")
+             pink="#F5C2E7", green="#A6E3A1", blue="#89B4FA", mauve="#CBA6F7", teal="#94E2D5", yellow="#F9E2AF", red="#F38BA8")
 
 
 def luminance(h):
@@ -130,7 +130,7 @@ def contrast(a, b):
 def legible(fg, page, ratio=4.5):
     """Nudge fg toward black or white, keeping its hue, until it reads at
     `ratio` on the page. The art is transparent, so `page` is GitHub's own
-    background, not Catppuccin's base. Latte's green, teal, yellow and
+    background, not Catppuccin's base. Latte's pink, teal, yellow and
     overlay2 fall short on white; Mocha passes untouched."""
     target = "#000000" if luminance(page) > 0.5 else "#FFFFFF"
     k = 0.0
@@ -140,11 +140,11 @@ def legible(fg, page, ratio=4.5):
 
 
 def flavour(c, page):
-    roles = dict(ink=c["text"], muted=c["subtext0"], faint=c["overlay2"], prompt=c["green"], path=c["blue"],
-                 accent=c["mauve"], easy=c["teal"], medium=c["yellow"], hard=c["red"])
+    roles = dict(ink=c["text"], muted=c["subtext0"], faint=c["overlay2"], prompt=c["pink"], path=c["blue"],
+                 accent=c["blue"], easy=c["teal"], medium=c["yellow"], hard=c["red"])
     out = {k: legible(v, page) for k, v in roles.items()}
     # Heat cells are graphics, not text: keep Catppuccin's own green ramp.
-    out["heat"] = heat(c["empty"], c["base"], c["green"])
+    out["heat"] = heat(c["empty"], c["base"], c["pink"])
     return out
 
 
