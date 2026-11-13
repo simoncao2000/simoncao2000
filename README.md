@@ -1,9 +1,9 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg">
-  <img src="assets/hero-light.svg" width="100%" alt="Terminal: whoami prints Simon Cao drawn as a contribution heatmap. Software Engineer, full-stack web. Focus: full-stack web development. Stack: React, TypeScript, Next.js, Python. Education: B.S. Computer Science, UW–Stout, 2026. Status: open to full-time roles.">
+  <img src="assets/hero-light.svg" width="100%" alt="Terminal: whoami prints Simon Cao drawn as a contribution heatmap. Software Engineer, full-stack web. Now: Software Development Intern, ShyftFi LLC. Focus: full-stack web development. Stack: React, TypeScript, Next.js, Python. Education: B.S. Computer Science, UW–Stout, 2026. Status: open to full-time roles.">
 </picture>
 
-Software engineer building full-stack web apps with React, TypeScript and Python. I graduated from the University of Wisconsin–Stout in 2026 with a B.S. in Computer Science, and I'm currently a software development intern at ShyftFi.
+Software engineer building full-stack web apps with React, TypeScript and Python. I graduated from the University of Wisconsin–Stout in 2026 with a B.S. in Computer Science, and I'm currently a software development intern at ShyftFi LLC.
 
 `mail` [caosonminh2000@gmail.com](mailto:caosonminh2000@gmail.com) &nbsp;·&nbsp; `linkedin` [simon-cao](https://www.linkedin.com/in/simon-cao-135122197/)
 
@@ -19,7 +19,7 @@ Software engineer building full-stack web apps with React, TypeScript and Python
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/stack-dark.svg">
-  <img src="assets/stack-light.svg" width="100%" alt="Languages: TypeScript, JavaScript, Python, Java, SQL, Swift, HTML/CSS. Frameworks: React, Next.js, React Router, Tailwind CSS, Odoo, JavaFX, SwiftUI. Data: IndexedDB, Firebase, Sanity CMS, MySQL, MongoDB. Tools: AWS, Git, GitHub, Jira, Vite, Maven, Figma, Claude Code, Codex.">
+  <img src="assets/stack-light.svg" width="100%" alt="Languages: TypeScript, JavaScript, Python, Java, SQL, Swift, HTML/CSS. Frameworks: React, Next.js, React Router, Tailwind CSS, Odoo ERP, JavaFX, SwiftUI. Data: IndexedDB, Firebase, Sanity CMS, MySQL, MongoDB. Tools: AWS, Git, GitHub, Jira, Vite, Maven, Figma, Claude Code, Codex.">
 </picture>
 
 ## LeetCode

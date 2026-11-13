@@ -97,17 +97,32 @@ def wrap(face, s, size, maxw):
 
 
 # ------------------------------------------------------------------ palette
-# One step off GitHub's own colours so the art sits naturally on the page.
-T = {
-    "light": dict(bg="#F6F8FA", bar="#EAEEF2", border="#D1D9E0", ink="#1F2328", muted="#59636E",
-                  faint="#818B98", prompt="#1A7F37", path="#0969DA", dot="#D1D9E0",
-                  easy="#1A7F37", medium="#9A6700", hard="#CF222E",
-                  heat=["#EFF2F5", "#ACEEBB", "#4AC26B", "#2DA44E", "#116329"]),
-    "dark": dict(bg="#0D1117", bar="#151B23", border="#30363D", ink="#E6EDF3", muted="#9198A1",
-                 faint="#6E7681", prompt="#3FB950", path="#58A6FF", dot="#3D444D",
-                 easy="#3FB950", medium="#D29922", hard="#F85149",
-                 heat=["#151B23", "#033A16", "#196C2E", "#2EA043", "#56D364"]),
-}
+# Catppuccin (https://catppuccin.com/palette): Macchiato for GitHub's dark
+# mode, Latte, its light flavour, for light mode.
+def mix(a, b, k):
+    """Blend hex colour a toward b by k (0..1)."""
+    ca = [int(a[i:i + 2], 16) for i in (1, 3, 5)]
+    cb = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join(f"{round(x + (y - x) * k):02X}" for x, y in zip(ca, cb))
+
+
+def heat(empty, base, green, steps=(0.35, 0.6, 0.8, 1.0)):
+    return [empty] + [mix(base, green, k) for k in steps]
+
+
+LATTE = dict(base="#EFF1F5", surface0="#CCD0DA", empty="#E6E9EF", text="#4C4F69", subtext0="#6C6F85", overlay2="#7C7F93",
+             green="#40A02B", blue="#1E66F5", mauve="#8839EF", teal="#179299", yellow="#DF8E1D", red="#D20F39")
+MACCHIATO = dict(base="#24273A", surface0="#363A4F", empty="#363A4F", text="#CAD3F5", subtext0="#A5ADCB", overlay2="#939AB7",
+                 green="#A6DA95", blue="#8AADF4", mauve="#C6A0F6", teal="#8BD5CA", yellow="#EED49F", red="#ED8796")
+
+
+def flavour(c):
+    return dict(ink=c["text"], muted=c["subtext0"], faint=c["overlay2"], prompt=c["green"], path=c["blue"],
+                accent=c["mauve"], easy=c["teal"], medium=c["yellow"], hard=c["red"],
+                heat=heat(c["empty"], c["base"], c["green"]))
+
+
+T = {"light": flavour(LATTE), "dark": flavour(MACCHIATO)}
 
 STYLE = """<style>
   .o{animation:show .01s backwards}
@@ -203,11 +218,11 @@ def name_heatmap(t, x, y, pitch, cell, start_ms):
 
 def hero(theme):
     t = T[theme]
-    W, H = 1280, 640
+    W, H = 1280, 676
     s = window(W, H, t, "simon@cao: ~",
                "Terminal. whoami prints the name Simon Cao drawn as a contribution heatmap, "
                "then: Software Engineer, full-stack web. "
-               "Focus: full-stack web development. Stack: React, TypeScript, Next.js, Python. "
+               "Now: Software Development Intern, ShyftFi LLC. Focus: full-stack web development. Stack: React, TypeScript, Next.js, Python. "
                "Education: B.S. Computer Science, UW–Stout, 2026. Status: open to full-time roles.")
     x, sz = 48, 24
     p, _ = prompt(t, x, 104, sz, "whoami", delay=200)
@@ -218,7 +233,8 @@ def hero(theme):
     s.append(later(1600, text(mono, "Software Engineer · full-stack web", sz, x, 342, t["muted"])))
     p, _ = prompt(t, x, 414, sz, "cat profile.txt", delay=1800)
     s.append(p)
-    rows = [("focus", "Full-stack web development", None),
+    rows = [("now", "Software Development Intern, ShyftFi LLC", None),
+            ("focus", "Full-stack web development", None),
             ("stack", "React, TypeScript, Next.js, Python", None),
             ("education", "B.S. Computer Science, UW–Stout '26", None),
             ("status", "Open to full-time roles", t["prompt"])]
@@ -232,8 +248,9 @@ def hero(theme):
             vx += 26
         out.append(text(mono, v, sz, vx, y, t["ink"]))
     s.append(later(2500, "".join(out)))
-    p, cx = prompt(t, x, 606, sz, "")
-    s.append(later(2700, p + f'<rect class="c" x="{cx + 2}" y="{606 - 21}" width="13" height="27" fill="{t["ink"]}"/>'))
+    py = 458 + len(rows) * 36 + 6
+    p, cx = prompt(t, x, py, sz, "")
+    s.append(later(2700, p + f'<rect class="c" x="{cx + 2}" y="{py - 21}" width="13" height="27" fill="{t["ink"]}"/>'))
     s.append("</svg>")
     return "\n".join(s)
 
@@ -281,9 +298,9 @@ def project_row(p, theme):
     s = bare(W, H, label)
     s.append(text(mono, "drwxr-xr-x", sz, ROW_X, 34, t["faint"]))
     s.append(text(mono, p["date"], sz, ROW_X + mono.width("drwxr-xr-x  ", sz), 34, t["muted"]))
-    s.append(text(mono_bd, p["dir"] + "/", sz, nx, 34, t["path"]))
+    s.append(text(mono_bd, p["dir"] + "/", sz, nx, 34, t["accent"]))
     ax = nx + mono_bd.width(p["dir"] + "/", sz) + 14
-    s.append(f'<path d="M{ax} 32L{ax+12} 20M{ax+3} 20H{ax+12}V29" fill="none" stroke="{t["path"]}" '
+    s.append(f'<path d="M{ax} 32L{ax+12} 20M{ax+3} 20H{ax+12}V29" fill="none" stroke="{t["accent"]}" '
              f'stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>')
     y = 34 + 36
     for line in lines:
@@ -298,7 +315,7 @@ def project_row(p, theme):
 # Straight from the resume's Technical Skills section.
 STACK = [
     ("languages", "TypeScript, JavaScript, Python, Java, SQL, Swift, HTML/CSS"),
-    ("frameworks", "React, Next.js, React Router, Tailwind CSS, Odoo, JavaFX, SwiftUI"),
+    ("frameworks", "React, Next.js, React Router, Tailwind CSS, Odoo ERP, JavaFX, SwiftUI"),
     ("data", "IndexedDB, Firebase, Sanity CMS, MySQL, MongoDB"),
     ("tools", "AWS, Git, GitHub, Jira, Vite, Maven, Figma, Claude Code, Codex"),
 ]
