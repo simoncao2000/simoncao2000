@@ -12,15 +12,18 @@ TOP = 66      # animated blocks lay out from y≈100; their view starts here
 #   .k  a typed command: revealed one character per step
 #   .c  the cursor: blinks
 #   .h  one heatmap column: fades in
+#   .a  a ring segment (pathLength=100): draws from nothing to its length
 STYLE = """<style>
   .o{animation:show .01s backwards}
   .k{animation:type .45s steps(14,end) backwards}
   .c{animation:blink 1.1s steps(1,end) infinite}
   .h{animation:show .3s cubic-bezier(.23,1,.32,1) backwards}
+  .a{animation:draw .9s cubic-bezier(.23,1,.32,1) backwards}
   @keyframes show{from{opacity:0}}
   @keyframes type{from{clip-path:inset(-20% 100% -20% 0)}to{clip-path:inset(-20% 0 -20% 0)}}
   @keyframes blink{50%{opacity:0}}
-  @media (prefers-reduced-motion:reduce){.o,.k,.c,.h{animation:none}}
+  @keyframes draw{from{stroke-dasharray:0 100}}
+  @media (prefers-reduced-motion:reduce){.o,.k,.c,.h,.a{animation:none}}
 </style>"""
 
 CLOSE = "</svg>"

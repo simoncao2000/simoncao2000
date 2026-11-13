@@ -10,9 +10,9 @@ PAGE = {"light": "#FFFFFF", "dark": "#0D1117"}
 
 # `empty` is the heatmap's level-0 cell: Latte crust on white, Mocha mantle on
 # GitHub dark (Mocha crust is 1.01:1 against #0D1117 and disappears).
-LATTE = dict(base="#EFF1F5", empty="#DCE0E8", text="#4C4F69", subtext0="#6C6F85", overlay2="#7C7F93",
+LATTE = dict(base="#EFF1F5", empty="#DCE0E8", panel="#E6E9EF", text="#4C4F69", subtext0="#6C6F85", overlay2="#7C7F93",
              pink="#EA76CB", green="#40A02B", blue="#1E66F5", teal="#179299", yellow="#DF8E1D", red="#D20F39")
-MOCHA = dict(base="#1E1E2E", empty="#181825", text="#CDD6F4", subtext0="#A6ADC8", overlay2="#9399B2",
+MOCHA = dict(base="#1E1E2E", empty="#181825", panel="#1E1E2E", text="#CDD6F4", subtext0="#A6ADC8", overlay2="#9399B2",
              pink="#F5C2E7", green="#A6E3A1", blue="#89B4FA", teal="#94E2D5", yellow="#F9E2AF", red="#F38BA8")
 
 TEXT_CONTRAST = 4.5     # WCAG AA for normal text
@@ -62,12 +62,26 @@ def text_roles(c):
                 easy=c["teal"], medium=c["yellow"], hard=c["red"])
 
 
+DIFFICULTY_COLOURS = {"Easy": "teal", "Medium": "yellow", "Hard": "red"}
+TRACK_TINT = 0.3  # how much of the difficulty colour shows in its empty track
+
+
+def ring_colours(c, page):
+    """{difficulty: (fill, track)} for the LeetCode gauge. Fills are marks, so
+    they need 3:1 against the page; tracks are the same hue, faded."""
+    return {d: (legible(c[name], page, GRAPHIC_CONTRAST), mix(c["empty"], c[name], TRACK_TINT))
+            for d, name in DIFFICULTY_COLOURS.items()}
+
+
 def theme(c, page):
     """All roles for one flavour on one page: legible text colours, the heat
-    ramp (graphics keep the palette's own shades), and the green status dot,
-    which means "available" whatever the accent."""
+    ramp (graphics keep the palette's own shades), the LeetCode gauge
+    colours, and the green status dot, which means "available" whatever the
+    accent."""
     roles = {k: legible(v, page) for k, v in text_roles(c).items()}
     roles["heat"] = heat_ramp(c)
+    roles["ring"] = ring_colours(c, page)
+    roles["panel"] = c["panel"]  # LeetCode difficulty boxes: Latte mantle, Mocha base
     roles["ok"] = legible(c["green"], page, GRAPHIC_CONTRAST)
     return roles
 
