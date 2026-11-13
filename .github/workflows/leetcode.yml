@@ -23,13 +23,13 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: scripts/requirements.txt
+          cache-dependency-path: generator/requirements.txt
       - uses: actions/cache@v4
         with:
-          path: scripts/.fonts
+          path: generator/.fonts
           key: fonts-jetbrains-mono-v1
-      - run: pip install -r scripts/requirements.txt
-      - run: python scripts/build_profile.py
+      - run: pip install -r generator/requirements.txt
+      - run: python -m generator
       - name: Commit if the card changed
         run: |
           git add assets

@@ -1,2 +1,4 @@
-scripts/.fonts/
+generator/.fonts/
 __pycache__/
+# Private: has a phone number. Keep it out of this public repo.
+Simon_Cao_Resume.tex
