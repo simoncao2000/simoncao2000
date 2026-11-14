@@ -3,12 +3,12 @@
 Keep the README's alt text and links in step when you edit a project.
 """
 
-LEETCODE_USER = "000433430"
+LEETCODE_USER = "SimonCao2000"
 
 # Spelled out in the hero heatmap. Only letters in blocks/hero.py GLYPHS work.
 NAME = "Simon Cao"
 
-TAGLINE = "Software Engineer -- full-stack developer"
+TAGLINE = "Software Engineer -- Full-Stack Developer"
 
 # `cat profile.txt` rows, in order. STATUS is printed last, with a green dot.
 PROFILE = [

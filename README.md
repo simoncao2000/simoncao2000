@@ -47,7 +47,7 @@ Software engineer building full-stack web apps with React, TypeScript and Python
 
 ## LeetCode
 
-<a href="https://leetcode.com/u/000433430/">
+<a href="https://leetcode.com/u/SimonCao2000/">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/dark/leetcode.svg">
     <img src="assets/light/leetcode.svg" width="100%" alt="LeetCode stats: problems solved by difficulty and a 52-week submission heatmap.">
