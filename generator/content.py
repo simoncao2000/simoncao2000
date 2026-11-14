@@ -8,7 +8,7 @@ LEETCODE_USER = "000433430"
 # Spelled out in the hero heatmap. Only letters in blocks/hero.py GLYPHS work.
 NAME = "Simon Cao"
 
-TAGLINE = "Software Engineer · full-stack web"
+TAGLINE = "Software Engineer -- full-stack developer"
 
 # `cat profile.txt` rows, in order. STATUS is printed last, with a green dot.
 PROFILE = [
