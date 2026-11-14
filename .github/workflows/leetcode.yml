@@ -1,8 +1,15 @@
-name: Refresh LeetCode card
+name: Rebuild profile images
 
-# LeetCode can't notify GitHub, so poll hourly. The card only changes when
-# the stats change (or a new week starts), and we only commit then.
+# Runs when the generator changes, so edits to content.py show up without
+# running `python -m generator` locally. LeetCode can't notify GitHub, so it
+# also polls hourly; the cards only change when the stats change (or a new
+# week starts). It only commits when an image actually changed. Its own
+# commits don't retrigger it: pushes made with GITHUB_TOKEN start no workflows.
 on:
+  push:
+    branches: [main]
+    paths:
+      - "generator/**"
   schedule:
     - cron: "23 * * * *"
   workflow_dispatch:
@@ -30,14 +37,23 @@ jobs:
           key: fonts-jetbrains-mono-v1
       - run: pip install -r generator/requirements.txt
       - run: python -m generator
-      - name: Commit if the card changed
+      - name: Commit if an image changed
+        env:
+          EVENT: ${{ github.event_name }}
         run: |
           git add assets
           if git diff --cached --quiet; then
-            echo "Stats unchanged, nothing to commit"
+            echo "Images unchanged, nothing to commit"
           else
+            if [ "$EVENT" = "schedule" ]; then
+              message="Refresh LeetCode card"
+            else
+              message="Rebuild profile images"
+            fi
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit -m "Refresh LeetCode card"
+            git commit -m "$message"
+            # Someone may have pushed while this ran; replay on top of it.
+            git pull --rebase
             git push
           fi

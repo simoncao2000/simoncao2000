@@ -1,6 +1,6 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/dark/hero.svg">
-  <img src="assets/light/hero.svg" width="100%" alt="Terminal: whoami prints Simon Cao drawn as a contribution heatmap. Software Engineer, full-stack developer. Now: Software Development Intern, ShyftFi LLC. Focus: full-stack web development. Stack: React, TypeScript, Next.js, Python. Education: B.S. Computer Science, UW–Stout, 2026. Status: open to full-time roles.">
+  <img src="assets/light/hero.svg" width="100%" alt="Terminal: whoami prints Simon Cao drawn as a contribution heatmap. Software Engineer, Full-Stack Developer. Now: Software Development Intern, ShyftFi LLC. Focus: full-stack web development. Stack: React, TypeScript, Next.js, Python. Education: B.S. Computer Science, UW–Stout, 2026. Status: open to full-time roles.">
 </picture>
 
 Software engineer building full-stack web apps with React, TypeScript and Python. I graduated from the University of Wisconsin–Stout in 2026 with a B.S. in Computer Science, and I'm currently a software development intern at ShyftFi LLC.
